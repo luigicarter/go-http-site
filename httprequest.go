@@ -24,7 +24,7 @@ type LoginRequest struct {
 
 
 type AuthCheck struct{
-	AuthKey string
+	AuthKey string `json:"authToken"`
 }
 
 //////////////// LOGIN Authenticator 
@@ -106,6 +106,26 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 	if r.Method != http.MethodPost{
 		http.Error(w, "inalid request type", 404)
 	} 
-	
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	submitionKey := AuthCheck{}
+
+	err := decoder.Decode(&submitionKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	_, ok := AuthTokenPool[submitionKey.AuthKey]
+	if ok{
+		authRes := `{"authenticationResponse" : "ok"}`
+		encode := json.NewEncoder(w)
+		encode.Encode(authRes)
+	} else {
+		authRes := `{"authenticationResponse" : "false"}`
+		encode := json.NewEncoder(w)
+		encode.Encode(authRes)
+	}
 
 }

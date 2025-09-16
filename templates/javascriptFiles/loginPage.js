@@ -44,6 +44,7 @@ async function login(){
         
     }
     localStorage.setItem("authToken", response.userToken)
+    window.location.href = "/dashboard"
     
 }
 

@@ -31,6 +31,10 @@ func runHttpServer(kill *chan int) {
 	//////////////////
 
 	//// User Dashbaord
+	////////// Auth Checker
+	http.HandleFunc("/authcheck", AuthenticateUser)
+
+	////////////////
 	http.HandleFunc("/dashboard", UserDashBoardHtml)
 	http.HandleFunc("/dashboard.css", UserDashBoardCSS)
 	http.HandleFunc("/dashboard.js", UserDashBoardJS)
