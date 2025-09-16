@@ -99,7 +99,7 @@ var LoginHandler = func(w http.ResponseWriter, r *http.Request) {
 
 ////////////////////////////////////////////////////////////////
 
-
+/////////////////////// User authentication via Token map pool in the server.go file
 
 var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 
@@ -129,3 +129,7 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 	}
 
 }
+////////////////////////////////////////////////////////////////
+
+
+

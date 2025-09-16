@@ -1,4 +1,5 @@
-
+const usernameLabel = document.getElementById("userName")
+ 
 
 async function checkIfLoggedIn(){
     try {
