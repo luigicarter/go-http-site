@@ -22,7 +22,6 @@ type LoginRequest struct {
 }
 
 
-
 type AuthCheck struct{
 	AuthKey string `json:"authToken"`
 }

@@ -58,6 +58,28 @@ var LoginCss = func(w http.ResponseWriter, r *http.Request)  {
 ////////////////////////////////////////////////////////////////////////////////////
 
 
+//////////////////\\\\\// serve ahtentication file fucntion
+var authenticationJSFile = func (w http.ResponseWriter, r *http.Request){
+
+	authFunc , authFuncErr := os.Open("./templates/javascriptFiles/authentication.js")
+	if authFuncErr != nil {
+		fmt.Println("issue opening ahtentication js file ")
+		return 
+	}
+
+	w.Header().Set("Content-Type", "application/javascript")
+
+	defer authFunc.Close()
+
+	_ , copyErr := io.Copy(w, authFunc)
+	if copyErr  != nil {
+		fmt.Println("Issue writing auth js file to io.cope method ")
+		return
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
 
 //////////////////\\\\\// DASHBOARD ENDPOINJTS 
 

@@ -30,6 +30,10 @@ func runHttpServer(kill *chan int) {
 	http.HandleFunc("/login", LoginHandler)
 	//////////////////
 
+	///////////authentication function
+	http.HandleFunc("/authentication.js", authenticationJSFile)
+	////////////////////////
+
 	//// User Dashbaord
 	////////// Auth Checker
 	http.HandleFunc("/authcheck", AuthenticateUser)

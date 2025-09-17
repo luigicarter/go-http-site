@@ -1,4 +1,61 @@
 #fileListCon{
     border-top: solid;
     border-width: 1px;
+
+}
+
+body{
+    margin-left: 150px;
+}
+.sidenav {
+    width: 130px;
+    position: fixed;
+    z-index: 1;
+    top: 20px;
+    left: 10px;
+    background: #eee;
+    overflow-x: hidden;
+    padding: 8px 0;
+    border-radius: 5px;
+}
+.sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #2196F3;
+    display: block;
+}
+.sidenav a:hover {
+    color: #064579;
+}
+.main {
+    margin-left: 40x; /* Increased from 140px to account for sidebar width + left position + some buffer */
+    /* font-size: 28px; */
+    padding: 20px 10px;
+    word-wrap: break-word; /* Prevents long text from overflowing */
+    overflow-wrap: break-word; /* Additional word breaking support */
+}
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+    .sidenav a {
+        font-size: 18px;
+    }
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+    .sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    
+    .main {
+        margin-left: 0;
+        padding: 10px;
+    }
 }
