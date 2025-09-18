@@ -44,6 +44,13 @@ func runHttpServer(kill *chan int) {
 	http.HandleFunc("/dashboard.js", UserDashBoardJS)
 	///////////////////
 
+	//////////////// file upload 
+
+	http.HandleFunc("/upload", fileReceipt)
+
+
+	/////////////
+
 	println("Server is listening on 127.0.0.1:8080")
 	defer httpServerPRocess.Done()
 

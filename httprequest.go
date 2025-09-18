@@ -5,7 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 )
 
 type LoginRes struct {
@@ -132,3 +135,22 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 
 
 
+//////////// Receive file from the user 
+
+var fileReceipt = func (w http.ResponseWriter, r *http.Request){
+	if r.Method != http.MethodPost {
+		http.Error(w, "Bad reqeust type", 405)
+	}
+	file , header, Error := r.FormFile("file")
+	if Error != nil {
+		http.Error(w, "Issue with form data", 405)
+		fmt.Println(Error)
+		log.Fatal(Error)
+	}
+
+	dst, _ := os.Create("downloads/" + header.Filename)
+	defer dst.Close()
+
+	io.Copy(dst, file)
+
+}
