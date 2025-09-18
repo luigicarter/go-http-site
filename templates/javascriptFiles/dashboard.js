@@ -5,13 +5,14 @@ const fileClick = document.getElementById("addFileClick")
 
 
 async function getFile(){
-    let fileHandle
     try{
+        const myKEy = localStorage.getItem("authToken")
         const [fileHandle] = await window.showOpenFilePicker({multiple: false});
         const file = await fileHandle.getFile();
 
         const formData = new FormData();
         formData.append('file', file); // ✅ This works
+        formData.append("key", myKEy)
 
         let uploadRequest = await fetch('/upload', {
           method: 'POST', 
@@ -21,7 +22,7 @@ async function getFile(){
 
     }catch(err){
         console.log(err); 
-        alert("Erro uploading file. Please try again later")
+        alert("Error uploading file. Please try again later")
         return      
     }
     

@@ -147,6 +147,15 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 		fmt.Println(Error)
 		log.Fatal(Error)
 	}
+	// _ , ok := AuthTokenPool[r.FormValue("key")]
+	// if !ok {
+	// 	type NoUserToken struct{
+	// 		Status string `json:"Status"`
+			
+	// 	}
+
+	// }
+	
 
 	dst, _ := os.Create("downloads/" + header.Filename)
 	defer dst.Close()
