@@ -139,11 +139,11 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 
 var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 	if r.Method != http.MethodPost {
-		http.Error(w, "Bad reqeust type", 405)
+		http.Error(w, "Bad reqeust type", http.StatusMethodNotAllowed)
 	}
 	file , header, Error := r.FormFile("file")
 	if Error != nil {
-		http.Error(w, "Issue with form data", 405)
+		http.Error(w, "Issue with form data", http.StatusMethodNotAllowed)
 		fmt.Println(Error)
 		log.Fatal(Error)
 	}
