@@ -74,6 +74,7 @@ var authenticationJSFile = func (w http.ResponseWriter, r *http.Request){
 	_ , copyErr := io.Copy(w, authFunc)
 	if copyErr  != nil {
 		fmt.Println("Issue writing auth js file to io.cope method ")
+		fmt.Println("issue getting js auth file ")
 		return
 	}
 }
@@ -94,6 +95,7 @@ var UserDashBoardHtml = func (w http.ResponseWriter, r *http.Request){
 
 	_, writingErr := io.Copy(w, page)
 	if writingErr != nil {
+		fmt.Println("issue with user home page html")
 		fmt.Println(writingErr)
 	}
 
@@ -113,6 +115,7 @@ var UserDashBoardCSS = func (w http.ResponseWriter, r *http.Request){
 	_, err := io.Copy(w, css)
 
 	if err != nil {
+		fmt.Println("issue getting css dashboard file ")
 		fmt.Println(cssErr)
 	}
 }
@@ -131,6 +134,7 @@ var UserDashBoardJS = func (w http.ResponseWriter, r *http.Request){
 	_, err := io.Copy(w, js)
 
 	if err != nil {
+		fmt.Println("issue getting js dashboard file ")
 		fmt.Println(err)
 	}
 }

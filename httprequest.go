@@ -29,6 +29,11 @@ type AuthCheck struct{
 	AuthKey string `json:"authToken"`
 }
 
+type NoUserTokenRes struct{
+			Status string `json:"Status"`
+			
+		}
+
 //////////////// LOGIN Authenticator 
 var LoginHandler = func(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -112,7 +117,7 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 
-	submitionKey := AuthCheck{}
+	var submitionKey AuthCheck
 
 	err := decoder.Decode(&submitionKey)
 	if err != nil {
@@ -147,15 +152,20 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 		fmt.Println(Error)
 		log.Fatal(Error)
 	}
-	// _ , ok := AuthTokenPool[r.FormValue("key")]
-	// if !ok {
-	// 	type NoUserToken struct{
-	// 		Status string `json:"Status"`
-			
-	// 	}
+	_ , ok := AuthTokenPool[r.FormValue("key")]
+	if !ok {
+		noUserTokenFound := NoUserTokenRes{Status: "false"}
+		encoder := json.NewEncoder(w)
+		encodeErr := encoder.Encode(noUserTokenFound)
+		if encodeErr != nil {
+			w.Write([]byte("{status : 'null'}"))
+		}
+		return 
+	}
 
-	// }
-	
+	defer file.Close()
+
+	fmt.Println(header.Size)
 
 	dst, _ := os.Create("downloads/" + header.Filename)
 	defer dst.Close()

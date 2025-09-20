@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,6 +20,13 @@ type UserLookUp struct{
 	Email string 
 	Status string 
 
+}
+
+type fileEntry struct {
+	Date string
+	DisplayName string
+	Hash string
+	Parent string
 }
 
 
@@ -95,4 +103,42 @@ func GetAUser(username string, password string) UserLookUp{
 	return  selectUser	
 	
 }
+
+/////////////// Enter new file into DB 
+
+func newFile(
+	Date string,
+	DisplayName string,
+	Hash string,
+	Parent string,
+	fileSize string
+	) error{
+	myDb := getDatabase()
+	dbConn, dbErr := sql.Open(myDb.Driver, myDb.File)
+	
+	if dbErr != nil {	
+		dbErrR := errors.New("connection loss")
+		return dbErrR
+	}
+
+	defer dbConn.Close()
+	execution, exError := dbConn.Prepare(`INSERT INTO FileDB (Date, DisplayName,  UniqueHash, Parent, fileSize) Values ("?", "?", "?", "?", "?");`)
+	if exError != nil {
+		fmt.Println(exError)
+		fmt.Println("DB excution PREPARE error")
+	}
+
+	execution.Exec(Date,
+		 DisplayName, 
+		Hash,
+	Parent)
+	
+
+
+
+	return nil
+}
+
+
+////////////////////////////////
 
