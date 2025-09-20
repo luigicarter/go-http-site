@@ -111,7 +111,7 @@ func newFile(
 	DisplayName string,
 	Hash string,
 	Parent string,
-	fileSize string
+	fileSize string,
 	) error{
 	myDb := getDatabase()
 	dbConn, dbErr := sql.Open(myDb.Driver, myDb.File)
