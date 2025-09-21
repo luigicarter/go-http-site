@@ -106,7 +106,7 @@ func GetAUser(username string, password string) UserLookUp{
 
 /////////////// Enter new file into DB 
 
-func newFile(
+func AddNewFileToDB(
 	Date string,
 	DisplayName string,
 	Hash string,
@@ -126,16 +126,23 @@ func newFile(
 	if exError != nil {
 		fmt.Println(exError)
 		fmt.Println("DB excution PREPARE error")
+		prepareError := errors.New("issue preparing add file command in db")
+		return prepareError
 	}
 
-	execution.Exec(Date,
-		 DisplayName, 
-		Hash,
-	Parent)
+	_ , finalEXError := execution.Exec(Date,
+			DisplayName, 
+			Hash,
+		Parent,
+	fileSize)
+	execution.Close()
+
+	if finalEXError != nil {
+		
+		finalEXErrorMsg := errors.New("issue adding new file to database")
+		return finalEXErrorMsg	
+	}
 	
-
-
-
 	return nil
 }
 
