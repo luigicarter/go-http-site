@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type LoginRes struct {
@@ -162,12 +163,40 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 		}
 		return 
 	}
+	currentTime := time.Now()
+	CurrentTimeToString := currentTime.String()
+	
+	currentUsername := string(AuthTokenPool[r.FormValue("key")].Username)
 
+	stringToBytes := CurrentTimeToString + currentUsername + header.Filename
+
+	UniqueHashBytes := []byte(stringToBytes) 
+	UniqueHash256 := sha256.Sum256(UniqueHashBytes)
+	uniqueHashString := hex.EncodeToString(UniqueHash256[:])
+
+
+	newFile := fileEntry{Date: CurrentTimeToString,
+						DisplayName : header.Filename,
+						Hash: uniqueHashString,
+						Parent: r.FormValue("parent"),
+						fileSize: r.FormValue("size"),
+						Owner: currentUsername}
+
+	dbFileEntryError := AddNewFileToDB(newFile)
+	
+	if dbFileEntryError != nil {
+		noUserTokenFound := NoUserTokenRes{Status: "false"}
+		encoder := json.NewEncoder(w)
+		encodeErr := encoder.Encode(noUserTokenFound)
+		if encodeErr != nil {
+			w.Write([]byte("{status : 'null'}"))
+		}
+	}
+	
+	
+	dst, _ := os.Create("downloads/" + uniqueHashString)
+	
 	defer file.Close()
-
-	fmt.Println(header.Size)
-
-	dst, _ := os.Create("downloads/" + header.Filename)
 	defer dst.Close()
 
 	io.Copy(dst, file)

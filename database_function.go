@@ -27,6 +27,15 @@ type fileEntry struct {
 	DisplayName string
 	Hash string
 	Parent string
+	fileSize string
+	Owner string
+}
+
+type ContentElement struct{
+	Name string
+	Hash string
+	Parent string
+	Type string
 }
 
 
@@ -106,23 +115,25 @@ func GetAUser(username string, password string) UserLookUp{
 
 /////////////// Enter new file into DB 
 
-func AddNewFileToDB(
-	Date string,
-	DisplayName string,
-	Hash string,
-	Parent string,
-	fileSize string,
-	) error{
+func AddNewFileToDB(myFile fileEntry) error{
 	myDb := getDatabase()
 	dbConn, dbErr := sql.Open(myDb.Driver, myDb.File)
-	
+
 	if dbErr != nil {	
 		dbErrR := errors.New("connection loss")
 		return dbErrR
 	}
 
 	defer dbConn.Close()
-	execution, exError := dbConn.Prepare(`INSERT INTO FileDB (Date, DisplayName,  UniqueHash, Parent, fileSize) Values ("?", "?", "?", "?", "?");`)
+	execution, exError := dbConn.Prepare(`INSERT INTO FileDB ( 
+											Date ,
+											DisplayName,  
+											UniqueHash, 
+											Parent, 
+											fileSize,
+											Owner,
+											Type) 
+											Values (? , ?, ?, ?, ?, ?, ?);`)
 	if exError != nil {
 		fmt.Println(exError)
 		fmt.Println("DB excution PREPARE error")
@@ -130,22 +141,75 @@ func AddNewFileToDB(
 		return prepareError
 	}
 
-	_ , finalEXError := execution.Exec(Date,
-			DisplayName, 
-			Hash,
-		Parent,
-	fileSize)
-	execution.Close()
+	_ , finalEXError := execution.Exec( myFile.Date,
+								myFile.DisplayName, 
+							myFile.Hash,
+						myFile.Parent,
+					myFile.fileSize,
+				myFile.Owner,
+			"File")
+
+	defer execution.Close()
 
 	if finalEXError != nil {
-		
 		finalEXErrorMsg := errors.New("issue adding new file to database")
 		return finalEXErrorMsg	
 	}
-	
 	return nil
 }
 
+///////////////////////////////////////////////////////////////////
 
-////////////////////////////////
+/////////////////////// get all the users file/folders 
 
+
+func getFileAndFolders(key string) (map[string]ContentElement, error){
+	emptyMap := make(map[string]ContentElement)
+	contentMap := make(map[string]ContentElement)
+
+	_ , ok := AuthTokenPool[key]
+	if !ok {
+		checkError := errors.New("auth token is not in pool")
+	
+		return  emptyMap, checkError
+	}
+	
+	user := AuthTokenPool[key].Username
+	
+
+
+
+	dbInfo := getDatabase()
+
+	cDB, openDbError := sql.Open(dbInfo.Driver, dbInfo.File)
+
+	if openDbError != nil {
+		return  emptyMap , openDbError
+	}
+	dbQuery := `SELECT DisplayName, UniqueHash, Parent , Type FROM FileDB WHERE Owner = '?'`
+
+	cQuery , queryError := cDB.Query(dbQuery, user)
+
+	if queryError != nil {
+		return emptyMap, queryError 
+	}
+
+	defer cQuery.Close()
+
+
+	for cQuery.Next() {
+
+		var fileElement ContentElement
+		cQueryScanError := cQuery.Scan(&fileElement.Name, 
+										&fileElement.Hash,
+										&fileElement.Parent,
+										&fileElement.Type)
+		if cQueryScanError != nil {
+			fmt.Println("issue mappign values to content element date type ")
+		}
+		contentMap[fileElement.Hash] = fileElement
+
+	}
+
+	return contentMap , nil 
+}
