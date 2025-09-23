@@ -38,9 +38,10 @@ async function getFile(){
           body: formData
         });
 
-        // let response = await uploadRequest.json()
+        let response = await uploadRequest.json()
 
-
+        console.log(response);
+        
 
     }catch(err){
         console.log(err); 

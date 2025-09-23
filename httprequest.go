@@ -201,4 +201,10 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 
 	io.Copy(dst, file)
 
+	currentFiles , _ := getFileAndFolders(r.FormValue("key"))
+	encode_files := json.NewEncoder(w)
+
+	encode_files.Encode(currentFiles)
+	
+
 }

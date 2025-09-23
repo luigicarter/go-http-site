@@ -163,7 +163,10 @@ func AddNewFileToDB(myFile fileEntry) error{
 /////////////////////// get all the users file/folders 
 
 
+
 func getFileAndFolders(key string) (map[string]ContentElement, error){
+	
+	
 	emptyMap := make(map[string]ContentElement)
 	contentMap := make(map[string]ContentElement)
 
@@ -186,7 +189,7 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 	if openDbError != nil {
 		return  emptyMap , openDbError
 	}
-	dbQuery := `SELECT DisplayName, UniqueHash, Parent , Type FROM FileDB WHERE Owner = '?'`
+	dbQuery := `SELECT DisplayName, UniqueHash, Parent , Type FROM FileDB WHERE OWNER = ?`
 
 	cQuery , queryError := cDB.Query(dbQuery, user)
 
@@ -209,7 +212,9 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 		}
 		contentMap[fileElement.Hash] = fileElement
 
+
 	}
+
 
 	return contentMap , nil 
 }
