@@ -33,7 +33,23 @@ type AuthCheck struct{
 type NoUserTokenRes struct{
 			Status string `json:"Status"`
 			
-		}
+}
+
+type folderAddition struct {
+	AuthKey string  `json:"AuthKey"`
+	Type string 	`json:"Type"`
+	Name string 	`json:"folderName"`
+	Parent string 	`json:"Parent"`
+	Owner string 
+	Hash string
+	Date string
+
+}
+
+
+
+
+
 
 //////////////// LOGIN Authenticator 
 var LoginHandler = func(w http.ResponseWriter, r *http.Request) {
@@ -229,9 +245,54 @@ var getUsersFilesAndFolders = func (w http.ResponseWriter, r *http.Request) {
 	}
 	encode := json.NewEncoder(w)
 	encode.Encode(currentFiles)
-	
-	
 }
+////////////////////////////////////////////////////////////
 
+////////////////////////////// Add fodler to DB 
 
-//////////////////////////////
+var addFolderHttp = func (w http.ResponseWriter, r *http.Request){
+	if r.Method != http.MethodPost{
+		http.Error(w, "invalid request type", http.StatusMethodNotAllowed)
+	}
+	
+	var folderInfo folderAddition
+
+	decodeKey := json.NewDecoder(r.Body)
+	
+	decodeKey.Decode(&folderInfo)
+
+	authError := checkAuthToken(folderInfo.AuthKey)
+	if authError != nil {
+		http.Error(w, "invalid Auth Token", http.StatusUnauthorized)
+		return 
+	}
+	folderInfo.Owner = AuthTokenPool[folderInfo.AuthKey].Username
+	now := time.Now()
+	nowString := now.String()
+
+	hashForFolderStringFormat :=  nowString + folderInfo.Owner +  folderInfo.Name
+
+	bytesForHash := []byte(hashForFolderStringFormat)
+	byteHash := sha256.Sum256(bytesForHash)
+	hashString := hex.EncodeToString(byteHash[:])
+
+	folderInfo.Hash = hashString
+	folderInfo.Date = nowString
+
+	addFolderError := addFodlerToDB(folderInfo)
+	
+	if addFolderError != nil {
+		http.Error(w, "issue adding folder to DB", http.StatusInternalServerError)
+	}
+
+	newFileList, newFileListError := getFileAndFolders(folderInfo.AuthKey)
+	if newFileListError != nil {
+		fmt.Println(newFileListError)
+	}
+
+	newFileListEncode := json.NewEncoder(w)
+	newFileListEncode.Encode(newFileList)
+	
+		
+
+}

@@ -187,6 +187,9 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 	if openDbError != nil {
 		return  emptyMap , openDbError
 	}
+
+	defer cDB.Close()
+
 	dbQuery := `SELECT DisplayName, UniqueHash, Parent , Type FROM FileDB WHERE OWNER = ?`
 
 	cQuery , queryError := cDB.Query(dbQuery, user)
@@ -217,3 +220,41 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 
 	return contentMap , nil 
 }
+
+///////////////////////////////////////////////////////////////////// 
+
+/////////////////////// Add folder to the database
+
+func addFodlerToDB (newFodler folderAddition) error{
+
+
+	db := getDatabase()
+	
+	dbConn, dbConnErr := sql.Open(db.Driver, db.File)
+
+	if dbConnErr != nil {
+
+		fmt.Println(dbConnErr)
+		return dbConnErr
+	}
+	defer dbConn.Close()
+
+	addFolder, prepareError:= dbConn.Prepare(`INSERT INTO FileDB (DisplayName, UniqueHash, Parent, Owner, date , Type , fileSize ) Values (?,?,?,?,?,?,?)`)
+
+	if prepareError != nil {
+		prepareErrorMsg := errors.New("unable to connect to DB")
+		fmt.Println(prepareError)
+		return prepareErrorMsg
+	}
+	_ , executionError := addFolder.Exec(newFodler.Name, newFodler.Hash, newFodler.Parent , newFodler.Owner, newFodler.Date , newFodler.Type , "folder" )
+
+	if executionError != nil{
+		fmt.Println(executionError)
+	}
+	defer addFolder.Close()
+	
+	return nil
+} 
+
+
+////////////////

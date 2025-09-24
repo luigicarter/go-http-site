@@ -1,10 +1,16 @@
-
-
+/////// element that's used 
 const fileClick = document.getElementById("addFileClick")
+
+
 const contentList = document.getElementById("contentList")
 const overlay = document.getElementById("myOverlay")
 const addFolderOVerlay = document.getElementById("addFolderClick")
 const cancelFolderCreation = document.getElementById("cancelFolderCreation")
+const folderName = document.getElementById("fodlerName")
+
+const addFolderButton = document.getElementById("createFolder")
+
+
 let contentMap = {}
 
 addFolderOVerlay.addEventListener("click", ()=>{
@@ -37,7 +43,6 @@ const currentPosition = ()=>{
 function postFiles(items){
     contentList.innerHTML = ""
     for (i in items){
-        console.log(i);
         let contentCardFormat = `
          <div class="card cardsLine text-dark bg-light mb-3" style="width: 14rem;">
 
@@ -80,15 +85,13 @@ async function getFilesOnLoad(){
     let files = await fetch("/getFiles", {
         method : "POST" ,
         headers : {"Content-Type": "applacation/json"},
-            body : JSON.stringify({authToken : myKEy})
+        body : JSON.stringify({authToken : myKEy})
         
     })
-
-    
     
     let response = await files.json()
     contentMap = response
-
+    
     return response
 }
 
@@ -103,30 +106,30 @@ async function getFile(){
     try{
         
         const myKEy = localStorage.getItem("authToken")
-
+        
         const [fileHandle] = await window.showOpenFilePicker({multiple: false});
         const file = await fileHandle.getFile();
-
+        
         const formData = new FormData();
         formData.append('file', file);
         formData.append("key", myKEy)
         formData.append("size", `${file.size}` )
         formData.append("parent", currentPosition())
         console.log(file.size);
-
+        
         let uploadRequest = await fetch('/upload', {
-          method: 'POST', 
-          body: formData
+            method: 'POST', 
+            body: formData
         });
-
+        
         let response = await uploadRequest.json()
         contentMap = response
         
         postFiles(response)
-
-    
         
-
+        
+        
+        
     }catch(err){
         console.log(err); 
         alert("Error uploading file. Please try again later")
@@ -137,7 +140,6 @@ async function getFile(){
 
 
 fileClick.addEventListener("click", ()=>{
-    console.log("clicks");
     getFile()
     
     
@@ -148,13 +150,34 @@ fileClick.addEventListener("click", ()=>{
 
 
 
-// let contentCardFormat = `
-//      <div class="card cardsLine text-dark bg-light mb-3" onclick="itemClicked(event)" style="width: 18rem;">
-//         <div class="card-body">
-//                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
-//                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
-//                 </svg>
-//             <h5 class="card-title">Special title treatment</h5>
-//         </div>
-//     </div>
-// `
+async function addFolder(){
+    const myKEy = localStorage.getItem("authToken")
+    let folderAddCall = await fetch("/addFolder", {
+        method : "POST",
+        headers : {"Content-Type" : "application/json"},
+        body : JSON.stringify({
+            
+            AuthKey : myKEy,
+            Type : "Folder",
+            folderName : folderName.value,
+            Parent : currentPosition()
+            
+        })
+    }) 
+    
+    let response = await folderAddCall.json()
+    
+    postFiles(response)
+    overlay.style.display = "None"
+    
+    
+}
+
+
+
+addFolderButton.addEventListener("click", ()=>{
+    addFolder()
+})
+
+
+
