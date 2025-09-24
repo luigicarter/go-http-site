@@ -12,6 +12,25 @@
 </head>
 <body>
 
+
+
+<!-- OVERLAY Bellow  -->
+    <div class="overlay" id="myOverlay">
+  <div class="overlay-content">
+    <h2>Add a folder</h2>
+    <p>This is the content displayed within the overlay.</p>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Folder Name" aria-label="Username">
+        </div>
+    <button class="btn btn-primary" id="cancelFolderCreation">Cancel</button>
+    <button class="btn btn-success" >Create Folder</button>
+  </div>
+</div>
+<!-- OVERLAY ABOVE  -->
+
+
+
+
 <div class="container-fluid">
     <div class="row flex-nowrap">
         <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
@@ -26,7 +45,7 @@
                         </a>
                     </li>
                 
-                    <li>
+                    <li id="addFolderClick">
                         <a href="#" class="nav-link px-0 align-middle">
                             <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">Create a folder</span></a>
                     </li>
@@ -55,10 +74,19 @@
             </div>
         </div>
         <!-- Content goes here /////////////////////////////////////////// -->
-        <div class="col py-3">
-            <div id="buttonArea"> 
-                
+        <div id="contentSide" class="col py-3">
+
+        <div id="optionNav"> 
+                <h3 class="archiveTitle">Content</h3>
+        </div>
+
+
+            <div id="contentList">
+
+
             </div>
+        
+
         </div>
     </div>
 </div>

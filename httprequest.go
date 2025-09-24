@@ -208,3 +208,30 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 	
 
 }
+
+////////////// get this user's file and folders for the first page load 
+
+var getUsersFilesAndFolders = func (w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost{
+		http.Error(w, "bad request type", http.StatusMethodNotAllowed)
+	}
+
+	var getKey AuthCheck
+
+	decode := json.NewDecoder(r.Body)
+	decode.DisallowUnknownFields()
+	decode.Decode(&getKey)
+
+	currentFiles , cFilesError := getFileAndFolders(getKey.AuthKey)
+	if cFilesError != nil{
+		http.Error(w, "issue getting file from DB", http.StatusInternalServerError)
+	}
+	encode := json.NewEncoder(w)
+	encode.Encode(currentFiles)
+	
+	
+}
+
+
+//////////////////////////////

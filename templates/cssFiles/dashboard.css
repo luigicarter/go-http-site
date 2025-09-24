@@ -1,3 +1,96 @@
 #addFileClick{
     cursor: pointer;
 }
+
+#contentSide{
+    background-color: rgba(5, 5, 57, 0.556);
+}
+
+#optionNav{
+    margin-top: 50px;
+    border-bottom: 5px solid;
+    /* border: solid; */
+    border-radius: 10px;
+    border-color: rgb(255, 255, 255);
+    margin-bottom: 50px;
+
+}
+
+.archiveTitle{
+    color: white;
+}
+
+
+.cardsLine {
+    float: left;
+    margin: 20px;
+}
+
+.card {
+    position: relative; /* For positioning the three dots */
+}
+
+/* Position three dots in top right */
+.card .bi-three-dots {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    
+}
+
+/* Align icon and title horizontally */
+.card-body {
+    display: flex;
+    align-items: center; /* Vertically centers the icon and title */
+    gap: 10px; /* Space between icon and title */
+    padding-top: 30px; /* Give space for the three dots */
+}
+
+.iconPosition {
+    flex-shrink: 0; /* Prevents icon from shrinking */
+    display: flex;
+    align-items: center;
+}
+
+.card-title {
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1; /* Takes remaining space */
+    margin: 0; /* Remove default h5 margin */
+    cursor: pointer;
+    margin: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center
+}
+
+.dots{
+    margin-bottom: 10px;
+}
+
+
+#myOverlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Black background with opacity */
+  z-index: 9999; /* High z-index to ensure it sits on top */
+ /* Use flexbox for centering content */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+}
+
+.overlay-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 5px;
+  text-align: center;
+}

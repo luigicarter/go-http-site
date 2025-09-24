@@ -46,11 +46,13 @@ func runHttpServer(kill *chan int) {
 	///////////////////
 
 	//////////////// file upload 
-
 	http.HandleFunc("/upload", fileReceipt)
-
-
 	/////////////
+
+
+	///////////// give users the file and folders list 
+	http.HandleFunc("/getFiles", getUsersFilesAndFolders)
+	////////////////
 
 	println("Server is listening on 127.0.0.1:8080")
 	defer httpServerPRocess.Done()

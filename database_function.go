@@ -170,6 +170,7 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 	emptyMap := make(map[string]ContentElement)
 	contentMap := make(map[string]ContentElement)
 
+
 	_ , ok := AuthTokenPool[key]
 	if !ok {
 		checkError := errors.New("auth token is not in pool")
@@ -179,9 +180,6 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 	
 	user := AuthTokenPool[key].Username
 	
-
-
-
 	dbInfo := getDatabase()
 
 	cDB, openDbError := sql.Open(dbInfo.Driver, dbInfo.File)
@@ -214,6 +212,7 @@ func getFileAndFolders(key string) (map[string]ContentElement, error){
 
 
 	}
+	
 
 
 	return contentMap , nil 
