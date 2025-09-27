@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
@@ -44,6 +45,10 @@ type folderAddition struct {
 	Hash string
 	Date string
 
+}
+
+type fileInfo struct{
+	UniqueHash string `json:"Hash"` 
 }
 
 
@@ -294,4 +299,33 @@ var addFolderHttp = func (w http.ResponseWriter, r *http.Request){
 	
 		
 
+}
+
+///////////////////////////////////////// file download feature on client side
+
+var fileTransferToClient = func (w http.ResponseWriter, r *http.Request)  {
+	if r.Method != http.MethodPost {
+		http.Error( w, "invalid request type" ,http.StatusMethodNotAllowed)
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	var fileFromClient fileInfo
+	decoder.Decode(&fileFromClient)
+	filePath := `\downloads` + fileFromClient.UniqueHash 
+	file, fileOpenError := os.Open(filePath)
+	
+	defer file.Close()
+
+	if fileOpenError != nil{
+		fmt.Println("file not Found")
+		http.Error(w, "file not found", http.StatusFailedDependency)
+	}
+
+	multiWriter := multipart.NewWriter(w)
+	defer multiWriter.Close()
+
+
+	// fileForm, fileFormError := multiWriter.CreateFormFile()
+	
 }

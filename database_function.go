@@ -38,6 +38,13 @@ type ContentElement struct{
 	Type string
 }
 
+type fileLookup struct {
+	Name  string 
+	Hash string
+	Type string
+
+}
+
 
 func getDatabase() *databaseInfo{
 	return  &databaseInfo{Driver: "sqlite3",File: "./appDB.db" }
@@ -257,4 +264,17 @@ func addFodlerToDB (newFodler folderAddition) error{
 } 
 
 
-////////////////
+//////////////////////////////////// get file FRom DB 
+
+// func getFileFromDB( uniqueHash string) error{
+
+// 	getDB := getDatabase()
+// 	dbObj , dbObjError := sql.Open(getDB.Driver, getDB.File)
+
+// 	if dbObjError != nil {
+
+// 	}
+
+
+
+// }
