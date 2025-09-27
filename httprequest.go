@@ -61,7 +61,6 @@ var LoginHandler = func(w http.ResponseWriter, r *http.Request) {
 	var loginData LoginRequest
 
 	decoder := json.NewDecoder(r.Body)
-
 	decoder.DisallowUnknownFields()
 
 	err := decoder.Decode(&loginData)
