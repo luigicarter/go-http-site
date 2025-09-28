@@ -56,11 +56,18 @@ function PostAllFiles(items){
             let dataElement = `
             <div class="card cardsLine text-dark bg-light mb-3" style="width: 14rem;">
             
-            <div class="dots">
+           <div class="dropdown dropup">
+            <button class="dots-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
-                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
                 </svg>
-            </div>
+            </button>
+            <ul class="dropdown-menu custom-dropdown-position">
+                <li><a class="dropdown-item" href="#" onclick="duplicateItem('${items[i].Hash}')">Move</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="deleteItem('${items[i].Hash}')">Delete</a></li>
+            </ul>
+        </div>
             
             <div class="card-body" >
             <div class="iconPosition">
@@ -95,17 +102,14 @@ function PostAllFiles(items){
             <div class="card-body" >
             
                 <div class="iconPosition">
+                
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="blue" class="bi bi-file-earmark-fill" viewBox="0 0 16 16">
                     <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2z"/>
                     </svg>
+                    
                 </div>
                     <h5 class="card-title" onclick="itemClicked('${items[i].Hash}')">${items[i].Name}</h5>
                 </div>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
 
             </div>
             `

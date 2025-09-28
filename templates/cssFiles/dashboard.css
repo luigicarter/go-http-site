@@ -102,3 +102,37 @@
 
 
 }
+
+.dots-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    color: #6c757d;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dots-btn:hover {
+    background-color: rgba(0,0,0,0.1);
+    color: #495057;
+}
+
+.dots-btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    outline: none;
+}
+
+.custom-dropdown-position {
+    position: absolute !important;
+    right: 0 !important;
+    left: auto !important;
+    bottom: 100% !important;
+    top: auto !important;
+    margin-bottom: 5px;
+    transform: none !important;
+}
+
+
