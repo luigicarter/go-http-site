@@ -46,6 +46,11 @@ type fileLookup struct {
 }
 
 
+type ASingleFile struct {
+	FileName string
+}
+
+
 func getDatabase() *databaseInfo{
 	return  &databaseInfo{Driver: "sqlite3",File: "./appDB.db" }
 }
@@ -266,15 +271,32 @@ func addFodlerToDB (newFodler folderAddition) error{
 
 //////////////////////////////////// get file FRom DB 
 
-// func getFileFromDB( uniqueHash string) error{
+func getFileFromDB( userKey string,   uniqueHash string) error{
 
-// 	getDB := getDatabase()
-// 	dbObj , dbObjError := sql.Open(getDB.Driver, getDB.File)
+	getDB := getDatabase()
+	dbObj , dbObjError := sql.Open(getDB.Driver, getDB.File)
 
-// 	if dbObjError != nil {
+	if dbObjError != nil {
+		return errors.New("db opening issue")
+	}
 
-// 	}
+	defer dbObj.Close()
+
+	user := AuthTokenPool[userKey].Username
+
+	query, queryError := dbObj.Query(`Select DisplayName FROM FileDB WHERE UniqueHash = ? AND Owner = ?`, uniqueHash, user)
+	if queryError != nil {
+		
+		return errors.New("query failed")
+	}
+	var file ASingleFile
+	for query.Next(){
+		query.Scan(&file.FileName)
+	}
+
+	fmt.Println(file)
+
+	return nil
+}
 
 
-
-// }

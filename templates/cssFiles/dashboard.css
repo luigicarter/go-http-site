@@ -1,5 +1,5 @@
 #addFileClick{
-    cursor: pointer;
+    cursor:none;
 }
 
 #contentSide{
@@ -14,6 +14,10 @@
     border-color: rgb(255, 255, 255);
     margin-bottom: 50px;
 
+}
+
+.card-title{
+     cursor:none;
 }
 
 .archiveTitle{

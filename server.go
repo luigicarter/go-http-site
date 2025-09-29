@@ -57,6 +57,8 @@ func runHttpServer(kill *chan int) {
 	////// add a folder 
 	http.HandleFunc("/addFolder", addFolderHttp)
 	////////
+	////// send requested  file to client
+	http.HandleFunc("/fileRequest", fileTransferToClient) 
 
 	println("Server is listening on 127.0.0.1:8080")
 	defer httpServerPRocess.Done()

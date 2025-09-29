@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
@@ -48,7 +47,8 @@ type folderAddition struct {
 }
 
 type fileInfo struct{
-	UniqueHash string `json:"Hash"` 
+	Key string `json:"key"`
+	UniqueHash string `json:"file"` 
 }
 
 
@@ -165,7 +165,7 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 
 var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 	if r.Method != http.MethodPost {
-		http.Error(w, "Bad reqeust type", http.StatusMethodNotAllowed)
+		http.Error(w, "Bad request type", http.StatusMethodNotAllowed)
 	}
 	file , header, Error := r.FormFile("file")
 	if Error != nil {
@@ -180,6 +180,7 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 		encodeErr := encoder.Encode(noUserTokenFound)
 		if encodeErr != nil {
 			w.Write([]byte("{status : 'null'}"))
+			return
 		}
 		return 
 	}
@@ -210,6 +211,7 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 		encodeErr := encoder.Encode(noUserTokenFound)
 		if encodeErr != nil {
 			w.Write([]byte("{status : 'null'}"))
+			return
 		}
 	}
 	
@@ -235,6 +237,7 @@ var getUsersFilesAndFolders = func (w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost{
 		http.Error(w, "bad request type", http.StatusMethodNotAllowed)
+		return
 	}
 
 	var getKey AuthCheck
@@ -246,6 +249,7 @@ var getUsersFilesAndFolders = func (w http.ResponseWriter, r *http.Request) {
 	currentFiles , cFilesError := getFileAndFolders(getKey.AuthKey)
 	if cFilesError != nil{
 		http.Error(w, "issue getting file from DB", http.StatusInternalServerError)
+		return
 	}
 	encode := json.NewEncoder(w)
 	encode.Encode(currentFiles)
@@ -257,6 +261,7 @@ var getUsersFilesAndFolders = func (w http.ResponseWriter, r *http.Request) {
 var addFolderHttp = func (w http.ResponseWriter, r *http.Request){
 	if r.Method != http.MethodPost{
 		http.Error(w, "invalid request type", http.StatusMethodNotAllowed)
+		return
 	}
 	
 	var folderInfo folderAddition
@@ -287,11 +292,13 @@ var addFolderHttp = func (w http.ResponseWriter, r *http.Request){
 	
 	if addFolderError != nil {
 		http.Error(w, "issue adding folder to DB", http.StatusInternalServerError)
+		return
 	}
 
 	newFileList, newFileListError := getFileAndFolders(folderInfo.AuthKey)
 	if newFileListError != nil {
 		fmt.Println(newFileListError)
+		return
 	}
 
 	newFileListEncode := json.NewEncoder(w)
@@ -312,20 +319,54 @@ var fileTransferToClient = func (w http.ResponseWriter, r *http.Request)  {
 	decoder.DisallowUnknownFields()
 	var fileFromClient fileInfo
 	decoder.Decode(&fileFromClient)
-	filePath := `\downloads` + fileFromClient.UniqueHash 
-	file, fileOpenError := os.Open(filePath)
 	
-	defer file.Close()
+	authCheck := checkAuthToken(fileFromClient.Key)
+	if authCheck != nil {
+		http.Error(w, "invalid authkey", http.StatusUnauthorized)
+		return
+	}
+	
+	fmt.Println(fileFromClient.UniqueHash)
+	
+	filePath := `.\downloads\` + fileFromClient.UniqueHash 
 
+	fmt.Println(filePath)
+
+	file, fileOpenError := os.Open(filePath)	
+	
 	if fileOpenError != nil{
 		fmt.Println("file not Found")
 		http.Error(w, "file not found", http.StatusFailedDependency)
+		return
 	}
+	
+	defer file.Close()
+	fmt.Println(file)
 
-	multiWriter := multipart.NewWriter(w)
-	defer multiWriter.Close()
+	getFileFromDB(fileFromClient.Key, fileFromClient.UniqueHash)
 
 
-	// fileForm, fileFormError := multiWriter.CreateFormFile()
+	// multiWriter := multipart.NewWriter(w)
+	// w.Header().Set("Content-Type", multiWriter.FormDataContentType())
+	
+	// defer multiWriter.Close()
+
+
+
+	
+
+	// form, formError := multiWriter.CreateFormFile("file", file.Name())
+
+	// if formError != nil {
+	// 	fmt.Println("issue creating file field")
+	// 	return
+	// }
+
+	// _, copyErr := io.Copy(form, file)
+	// if copyErr != nil {
+	// 	println("issue with io.copy file to form")
+	// 	return
+	// }
+
 	
 }
