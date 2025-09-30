@@ -271,13 +271,13 @@ func addFodlerToDB (newFodler folderAddition) error{
 
 //////////////////////////////////// get file FRom DB 
 
-func getFileFromDB( userKey string,   uniqueHash string) error{
-
+func getFileFromDB( userKey string,   uniqueHash string) ( ASingleFile ,error){
+	var emptyFile ASingleFile
 	getDB := getDatabase()
 	dbObj , dbObjError := sql.Open(getDB.Driver, getDB.File)
 
 	if dbObjError != nil {
-		return errors.New("db opening issue")
+		return emptyFile,  errors.New("db opening issue")
 	}
 
 	defer dbObj.Close()
@@ -287,16 +287,17 @@ func getFileFromDB( userKey string,   uniqueHash string) error{
 	query, queryError := dbObj.Query(`Select DisplayName FROM FileDB WHERE UniqueHash = ? AND Owner = ?`, uniqueHash, user)
 	if queryError != nil {
 		
-		return errors.New("query failed")
+		return emptyFile, errors.New("query failed")
 	}
 	var file ASingleFile
 	for query.Next(){
 		query.Scan(&file.FileName)
 	}
 
-	fmt.Println(file)
+	
 
-	return nil
+
+	return file , nil
 }
 
 

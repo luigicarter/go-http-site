@@ -154,10 +154,8 @@ function PostAllFiles(items){
                 contentList.innerHTML += element
             }
             fileCount++ 
-                
             }
         }
-
         return
 
 
@@ -271,15 +269,45 @@ function itemClicked(info){
 
 
 async function downloadFile(Hash){
-    let fileDownloadRequest = fetch("/fileRequest", {
-        headers : {"Content-Type" : "application/json" },
-        method : "POST",
-        body : JSON.stringify({ key : localStorage.getItem("authToken"),
-                                file : Hash}) 
 
-    })
+    try {
+        let fileDownloadRequest = await  fetch("/fileRequest", {
+            headers : {"Content-Type" : "application/json" },
+            method : "POST",
+            body : JSON.stringify({ key : localStorage.getItem("authToken"),
+                                    file : Hash}) 
     
+        })
+    
+        if (!fileDownloadRequest.ok){
+            throw new Error("unable to download file")
+        }
+        
+        const response = await fileDownloadRequest.formData()
+    
+        const file = response.get("file")
 
+        console.log(file);
+
+        const url = URL.createObjectURL(file)
+        const downloadButton = document.createElement("a")
+        downloadButton.href = url
+        downloadButton.download = file.name || file.name || "download"
+        document.body.appendChild(downloadButton)
+        downloadButton.style.display = "None"
+        downloadButton.click()
+
+        document.body.removeChild(downloadButton)
+
+        URL.revokeObjectURL(url)
+        
+
+    }catch(err){
+        console.log(err);
+        
+    }
+    
+      
 }
 
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
@@ -326,11 +327,11 @@ var fileTransferToClient = func (w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 	
-	fmt.Println(fileFromClient.UniqueHash)
+	
 	
 	filePath := `.\downloads\` + fileFromClient.UniqueHash 
 
-	fmt.Println(filePath)
+
 
 	file, fileOpenError := os.Open(filePath)	
 	
@@ -341,32 +342,31 @@ var fileTransferToClient = func (w http.ResponseWriter, r *http.Request)  {
 	}
 	
 	defer file.Close()
-	fmt.Println(file)
-
-	getFileFromDB(fileFromClient.Key, fileFromClient.UniqueHash)
 
 
-	// multiWriter := multipart.NewWriter(w)
-	// w.Header().Set("Content-Type", multiWriter.FormDataContentType())
-	
-	// defer multiWriter.Close()
+	fileName , fileNameError  := getFileFromDB(fileFromClient.Key, fileFromClient.UniqueHash)
+	fmt.Println(fileName.FileName)
+	if fileNameError != nil {
 
+		http.Error(w, "issue getting file name", http.StatusFailedDependency)
+		return 
+	}
 
-
-	
-
-	// form, formError := multiWriter.CreateFormFile("file", file.Name())
-
-	// if formError != nil {
-	// 	fmt.Println("issue creating file field")
-	// 	return
-	// }
-
-	// _, copyErr := io.Copy(form, file)
-	// if copyErr != nil {
-	// 	println("issue with io.copy file to form")
-	// 	return
-	// }
+	multiWriter := multipart.NewWriter(w)
+	w.Header().Set("Content-Type", multiWriter.FormDataContentType())
 
 	
+	defer multiWriter.Close()
+	
+	
+	
+	fileField, fileFieldError := multiWriter.CreateFormFile("file", fileName.FileName )
+
+	if fileFieldError != nil {
+		http.Error(w, "unable to create file file in multipart form ", http.StatusMultiStatus)
+		return
+	}
+
+	io.Copy(fileField, file)
+
 }
