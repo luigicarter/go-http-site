@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -53,6 +52,12 @@ type fileInfo struct{
 }
 
 
+type FileRemoval struct {
+	FileHash  string `json:"fileHash"`
+	Key string `json:"key"`
+	Type string `json:"Type"`
+
+}
 
 
 
@@ -73,6 +78,8 @@ var LoginHandler = func(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Issue decoding response ")
+		return
+
 	}
 	
 	w.Header().Set("Content-Type", "application/json")
@@ -93,6 +100,7 @@ var LoginHandler = func(w http.ResponseWriter, r *http.Request) {
 
 		if encodeErr != nil {
 			fmt.Println("issue encoding JSON")
+			return
 		}
 		return 
 		
@@ -134,7 +142,8 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 
 	if r.Method != http.MethodPost{
 		http.Error(w, "inalid request type", 404)
-	} 
+		return
+		} 
 
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
@@ -144,6 +153,7 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 	err := decoder.Decode(&submitionKey)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	_, ok := AuthTokenPool[submitionKey.AuthKey]
@@ -167,12 +177,14 @@ var AuthenticateUser = func( w http.ResponseWriter, r *http.Request ){
 var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 	if r.Method != http.MethodPost {
 		http.Error(w, "Bad request type", http.StatusMethodNotAllowed)
+		return 
 	}
 	file , header, Error := r.FormFile("file")
 	if Error != nil {
 		http.Error(w, "Issue with form data", http.StatusMethodNotAllowed)
 		fmt.Println(Error)
-		log.Fatal(Error)
+		
+		return 
 	}
 	_ , ok := AuthTokenPool[r.FormValue("key")]
 	if !ok {
@@ -214,6 +226,7 @@ var fileReceipt = func (w http.ResponseWriter, r *http.Request){
 			w.Write([]byte("{status : 'null'}"))
 			return
 		}
+		return 
 	}
 	
 	
@@ -370,3 +383,22 @@ var fileTransferToClient = func (w http.ResponseWriter, r *http.Request)  {
 	io.Copy(fileField, file)
 
 }
+///////////////////////////////////// Remove file 
+
+var removeFileHttpRequest = func (w http.ResponseWriter, r *http.Request){
+
+	if r.Method != http.MethodPost{
+		http.Error(w, "invalid request type", http.StatusBadRequest)
+		return
+	}
+
+	var requestInfo FileRemoval
+
+	decode := json.NewDecoder(r.Body)
+	decode.DisallowUnknownFields()
+	decode.Decode(&requestInfo)
+
+	fmt.Println(requestInfo)
+}
+
+//////////////////////////////////////////////////

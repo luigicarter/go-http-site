@@ -56,7 +56,7 @@ function folderClassification(contentInfo){
             </button>
             <ul class="dropdown-menu custom-dropdown-position">
                 <li><a class="dropdown-item" href="#" onclick="download('${contentInfo.Hash}')">Download</a></li>
-                <li><a class="dropdown-item" href="#" onclick="duplicateItem('${contentInfo.Hash}')">Move</a></li>
+   
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="#" onclick="deleteItem('${contentInfo.Hash}')">Delete</a></li>
             </ul>
@@ -91,7 +91,7 @@ function fileClassification(contentInfo){
             </button>
             <ul class="dropdown-menu custom-dropdown-position">
                 <li><a class="dropdown-item" href="#" onclick="downloadFile('${contentInfo.Hash}')">Download</a></li>
-                <li><a class="dropdown-item" href="#" onclick="duplicateItem('${contentInfo.Hash}')">Move</a></li>
+      
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="#" onclick="deleteItem('${contentInfo.Hash}')">Delete</a></li>
             </ul>

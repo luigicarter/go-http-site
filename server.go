@@ -59,7 +59,14 @@ func runHttpServer(kill *chan int) {
 	////////
 	////// send requested  file to client
 	http.HandleFunc("/fileRequest", fileTransferToClient) 
+	//////////////
 
+	////// remove file from a user's db
+
+	http.HandleFunc("/removeFile", removeFileHttpRequest)
+	///////////
+
+	
 	println("Server is listening on 127.0.0.1:8080")
 	defer httpServerPRocess.Done()
 
