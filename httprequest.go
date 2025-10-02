@@ -59,6 +59,16 @@ type FileRemoval struct {
 
 }
 
+type FolderItemRemoval struct{
+	Hash string `json:"Hash"`
+	Type string `json"Type"`
+}
+
+type FolderRemoval struct {
+	Key string `json:"key"`
+	FolderHashes []FolderItemRemoval `json:"folderHashes"`
+}
+
 
 
 
@@ -398,7 +408,61 @@ var removeFileHttpRequest = func (w http.ResponseWriter, r *http.Request){
 	decode.DisallowUnknownFields()
 	decode.Decode(&requestInfo)
 
-	fmt.Println(requestInfo)
+	authCheck := checkAuthToken(requestInfo.Key)
+	if authCheck != nil{
+		http.Error(w, "ahtentication failed", http.StatusUnauthorized)
+		return
+	}
+
+	if requestInfo.Type == "File"{
+		removeErr := removeFile(requestInfo.FileHash)
+		if removeErr != nil {
+
+			fmt.Println(removeErr)
+			return 
+		}
+		removeError := os.Remove("./downloads/" +requestInfo.FileHash )
+		if removeError!= nil {
+			fmt.Println("can't delete file")
+			fmt.Println(removeError)
+			return 
+		}
+		newFileList , newFileListError := getFileAndFolders(requestInfo.Key) 
+	
+		if newFileListError != nil {
+			http.Error(w, "unable to get files and folders from DB", http.StatusInternalServerError)
+			return 
+		}
+	
+	
+		encode := json.NewEncoder(w)
+		encode.Encode(newFileList)
+	}
+
 }
 
-//////////////////////////////////////////////////
+////////////////////////////  remove folders 
+
+var removeFolderFunc = func (w http.ResponseWriter, r *http.Request){
+	if r.Method != http.MethodPost{
+		http.Error(w, "invalid request type", http.StatusBadRequest)
+	}
+
+	var foldersToDeleteData FolderRemoval
+
+	decode := json.NewDecoder(r.Body)
+	decode.Decode(&foldersToDeleteData)
+	
+	authError := checkAuthToken(foldersToDeleteData.Key)
+	if authError != nil {
+		http.Error(w, "not authenticated", http.StatusUnauthorized)
+		return 
+	} 
+
+	deletionError := deleteFolder(foldersToDeleteData.FolderHashes)
+	if deletionError != nil {
+		http.Error(w, "unable to delete fodler(s)", http.StatusInternalServerError)
+		return
+	}
+
+}

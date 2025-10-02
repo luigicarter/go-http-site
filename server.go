@@ -65,6 +65,8 @@ func runHttpServer(kill *chan int) {
 
 	http.HandleFunc("/removeFile", removeFileHttpRequest)
 	///////////
+	/////////// remove folder 
+	http.HandleFunc("/deleteFolder", removeFolderFunc)
 
 	
 	println("Server is listening on 127.0.0.1:8080")

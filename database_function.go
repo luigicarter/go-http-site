@@ -38,16 +38,22 @@ type ContentElement struct{
 	Type string
 }
 
-type fileLookup struct {
-	Name  string 
-	Hash string
-	Type string
+// type fileLookup struct {
+// 	Name  string 
+// 	Hash string
+// 	Type string
 
-}
+// }
 
 
 type ASingleFile struct {
 	FileName string
+}
+
+type folderElement struct{
+	Hash string 
+	DisplayName string
+	Parent string
 }
 
 
@@ -301,3 +307,75 @@ func getFileFromDB( userKey string,   uniqueHash string) ( ASingleFile ,error){
 }
 
 
+////////////////////////////////////////
+
+/////////////////////////////////////////////////////// remove file from DB
+
+func removeFile(hash string ) error{
+	
+	dbinfo := getDatabase()
+
+	dbConn, dbConnErr := sql.Open(dbinfo.Driver, dbinfo.File)
+	if dbConnErr != nil {
+
+		return dbConnErr
+	} 
+	
+	defer dbConn.Close()
+	
+	dbConn.Exec("DELETE FROM FileDB where UniqueHash = ?", hash)
+
+	return nil
+}
+
+////////////// remove folder and all subfiles 
+
+func deleteFolder(folderHashes []FolderItemRemoval) (error){
+	
+	
+	dbInfo := getDatabase()
+
+	dbConn , dbConnErr := sql.Open(dbInfo.Driver, dbInfo.File)
+	if dbConnErr != nil {
+		return  errors.New("db error")
+	}
+
+	defer dbConn.Close()
+	
+	for i := 0 ; i < len(folderHashes); i++{
+		if folderHashes[i].Type == "Folder"{
+			fmt.Println(folderHashes[i])
+			deletion, deletionError := dbConn.Prepare(`DELETE FROM FileDB WHERE UniqueHash = ? `)
+			if deletionError != nil {
+				return  errors.New("query error")
+			}
+			deletion.Exec(folderHashes[i].Hash)
+
+		} else if folderHashes[i].Type == "File"{
+			fileRemovalError := removeFile(folderHashes[i].Hash)
+			if fileRemovalError != nil {
+				return errors.New("uanble to delete said file")
+			} 
+			FileDeletionError := deleteFile(folderHashes[i].Hash)
+			if FileDeletionError != nil {
+				return errors.New("unable to delete s said file with os package ")
+			}
+
+		}
+	}
+
+
+	return  nil
+}
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////

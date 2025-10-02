@@ -32,11 +32,7 @@ function setNewPosition(newPosition){
 }
 
 
-function backButtonFunction(){
-    positionHistory.pop()     
-    setNewPosition(positionHistory[positionHistory.length -1]) 
-    PostAllFiles(currentContentMap)
-}
+
 
 
 
@@ -58,7 +54,7 @@ function folderClassification(contentInfo){
                 <li><a class="dropdown-item" href="#" onclick="download('${contentInfo.Hash}')">Download</a></li>
    
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="#" onclick="deleteItem('${contentInfo.Hash}')">Delete</a></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="deleteFolder('${contentInfo.Hash}')">Delete</a></li>
             </ul>
         </div>
             
@@ -114,6 +110,7 @@ function fileClassification(contentInfo){
 
 
 
+
 //////////////////////////////
 
 function PostAllFiles(items){
@@ -132,16 +129,16 @@ function PostAllFiles(items){
 
     } else if (position == "root"){
         for (i in items){
-            if (items[i].Type == "File"){
-                let element = fileClassification(items[i])
-                contentList.innerHTML += element
-            } else if (items[i].Type == "Folder"){
-                let element = folderClassification(items[i])
-                contentList.innerHTML += element
-            }
-            
+            if (items[i].Parent  == "root"){
+                if (items[i].Type == "File"){
+                    let element = fileClassification(items[i])
+                    contentList.innerHTML += element
+                } else if (items[i].Type == "Folder"){
+                    let element = folderClassification(items[i])
+                    contentList.innerHTML += element
+                }
+            }   
         }
-
         return 
     } else if ( position != "root") {
         for (i in items){
@@ -149,7 +146,7 @@ function PostAllFiles(items){
                 if (items[i].Type == "File"){
                 let element = fileClassification(items[i])
                 contentList.innerHTML += element
-            } else if (items[i].Type == "Folder"){
+            }else if (items[i].Type == "Folder"){
                 let element = folderClassification(items[i])
                 contentList.innerHTML += element
             }
@@ -157,10 +154,7 @@ function PostAllFiles(items){
             }
         }
         return
-
-
     }
-    
     
 }
 
@@ -236,7 +230,8 @@ async function addFolder(){
     
     let response = await folderAddCall.json()
     
-    PostAllFiles(response)
+     let k = await getFilesOnLoad()
+    PostAllFiles(k)
     overlay.style.display = "None"
     
     
@@ -311,6 +306,95 @@ async function downloadFile(Hash){
 }
 
 
+async function deleteItem(Hash){
+    console.log(currentContentMap[Hash].Hash);
+    
+    const fileType = currentContentMap[Hash].Type
+    if (fileType == "File"){
+        try{
+            let fileRemovalRequest = await fetch("/removeFile", {
+             method : "POST",
+             headers : {"content-type" : "application/json"},
+             body : JSON.stringify({
+                fileHash : currentContentMap[Hash].Hash, 
+                Key:  localStorage.getItem("authToken"),
+                Type : currentContentMap[Hash].Type
+
+             })
+            })
+
+            let k = await getFilesOnLoad()
+            PostAllFiles(k)
+            
+
+        }catch(err){
+            console.log(err);
+            
+        }
+    }
+}
+
+
+function listOfFoldersToDelete(Hash){
+
+    let listEntry = []
+
+    if (listEntry.length < 1){
+        listEntry.push(currentContentMap[Hash])
+    }
+    for (i = 0 ; i < listEntry.length; i++ ){
+        for (x in currentContentMap){
+               if (listEntry[i].Name == currentContentMap[x].Parent){
+                listEntry.push(currentContentMap[x])
+            }
+            
+        }
+    }
+    let listOfHashes = []
+    for (i in listEntry){
+        item = { Hash : listEntry[i].Hash,
+                Type : listEntry[i].Type
+
+          }
+        listOfHashes.push(item)
+
+    }
+    return listOfHashes
+        
+}
+
+async function deleteFolder (Hash){
+    listOfFoldersToDelete(Hash)
+
+    let deleteFolderRequest = await fetch("/deleteFolder", {
+        method : "POST",
+        headers : {"content-Type" : "application/json" },
+        body : JSON.stringify({
+            key : localStorage.getItem("authToken"),
+            folderHashes : listOfFoldersToDelete(Hash)
+        })
+    }) 
+
+    if (!deleteFolderRequest.ok){
+        throw new Error("Request Error")
+        return
+    }
+
+    let k = await getFilesOnLoad()
+            PostAllFiles(k)
+
+
+
+    
+}
+
+
+function backButtonFunction(){
+
+    positionHistory.pop()     
+    setNewPosition(positionHistory[positionHistory.length -1]) 
+    PostAllFiles(currentContentMap)
+}
 
 
 (async()=>{

@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"os"
+)
 
 func checkAuthToken(key string) error {
 
@@ -11,4 +14,15 @@ func checkAuthToken(key string) error {
 	}
 	return nil 
 
+}
+
+func deleteFile(hash string) error {
+
+	osError := os.Remove("./downloads/" + hash)
+	if osError != nil {
+
+		return errors.New("unable to delete file")
+	}
+
+	return nil 
 }
